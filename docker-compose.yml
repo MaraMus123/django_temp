@@ -1,0 +1,57 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+    command: sh -c "python manage.py wait_for_db && \
+                    python manage.py migrate && \
+                    python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./app:/app
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_DEBUG: 1
+      USERS_DB: users_db
+      USERS_USER: postgres
+      USERS_PASSWORD: postgres
+      USERS_HOST: users_db
+      USERS_PORT: 5432
+      IMAGES_DB: images_db
+      IMAGES_USER: postgres
+      IMAGES_PASSWORD: postgres
+      IMAGES_HOST: images_db
+      IMAGES_PORT: 5432
+    env_file:
+      - .env
+    depends_on:
+      - users_db
+      - images_db
+
+  users_db:
+    image: postgres:latest
+    volumes:
+      - users_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: users_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+  images_db:
+    image: postgres:latest
+    volumes:
+      - images_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: images_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+
+volumes:
+  users_data:
+  images_data:

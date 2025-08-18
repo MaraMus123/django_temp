@@ -1,0 +1,12 @@
+server {
+    listen 80;
+    server_name mm-mg.diamantovacky.cz www.diamantovacky.cz;
+
+    location /.well-known/acme-challenge/ {
+        root /vol/www/;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}

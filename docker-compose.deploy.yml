@@ -1,0 +1,87 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+    restart: always
+    environment:
+        DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+        DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+        USERS_NAME:     ${USERS_POSTGRES_DB}
+        USERS_USER:     ${USERS_POSTGRES_USER}
+        USERS_PASSWORD: ${USERS_POSTGRES_PASSWORD}
+        USERS_HOST:     users_db
+        USERS_PORT:     ${USERS_PORT}
+        IMAGES_NAME:    ${IMAGES_POSTGRES_DB}
+        IMAGES_USER:    ${IMAGES_POSTGRES_USER}
+        IMAGES_PASSWORD: ${IMAGES_POSTGRES_PASSWORD}
+        IMAGES_HOST:    images_db
+        IMAGES_PORT:    ${IMAGES_PORT}
+        REMOTE_NAME: ${REMOTE_NAME}
+        REMOTE_USER: ${REMOTE_USER}
+        REMOTE_PASSWORD: ${REMOTE_PASSWORD}
+        REMOTE_HOST: ${REMOTE_HOST}
+        REMOTE_PORT: ${REMOTE_PORT}
+    volumes:
+      - static-data:/vol/static
+  users_db:
+      image: postgres:16
+      restart: always
+      environment:
+        POSTGRES_DB:       ${USERS_POSTGRES_DB}
+        POSTGRES_USER:     ${USERS_POSTGRES_USER}
+        POSTGRES_PASSWORD: ${USERS_POSTGRES_PASSWORD}
+      volumes:
+        - users-db-data:/var/lib/postgresql/data
+
+
+  images_db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_DB:       ${IMAGES_POSTGRES_DB}
+      POSTGRES_USER:     ${IMAGES_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${IMAGES_POSTGRES_PASSWORD}
+    volumes:
+      - images-db-data:/var/lib/postgresql/data
+
+
+  proxy:
+    build:
+      context: ./docker/proxy
+    restart: always
+    depends_on:
+      - app
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - certbot-web:/vol/www
+      - proxy-dhparams:/vol/proxy
+      - certbot-certs:/etc/letsencrypt
+      - static-data:/vol/static
+    environment:
+      - DOMAINS=${DOMAINS}
+
+  certbot:
+    build:
+      context: ./docker/certbot
+    command: echo "Skipping..."
+    environment:
+      - EMAIL=${ACME_DEFAULT_EMAIL}
+      - DOMAINS=${DOMAINS}
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+    volumes:
+       - certbot-web:/vol/www
+       - certbot-certs:/etc/letsencrypt
+    depends_on:
+      - proxy
+
+volumes:
+    static-data:
+    certbot-web:
+    proxy-dhparams:
+    certbot-certs:
+    images-db-data:
+    users-db-data:
