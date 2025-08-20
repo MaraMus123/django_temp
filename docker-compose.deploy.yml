@@ -25,6 +25,7 @@ services:
         REMOTE_PORT: ${REMOTE_PORT}
     volumes:
       - static-data:/vol/static
+      - media-data:/vol/media
   users_db:
       image: postgres:16
       restart: always
@@ -45,6 +46,8 @@ services:
       POSTGRES_PASSWORD: ${IMAGES_POSTGRES_PASSWORD}
     volumes:
       - images-db-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
 
 
   proxy:
@@ -61,6 +64,7 @@ services:
       - proxy-dhparams:/vol/proxy
       - certbot-certs:/etc/letsencrypt
       - static-data:/vol/static
+      - media-data:/vol/media
     environment:
       - DOMAINS=${DOMAINS}
 
@@ -80,6 +84,7 @@ services:
 
 volumes:
     static-data:
+    media-data:
     certbot-web:
     proxy-dhparams:
     certbot-certs:

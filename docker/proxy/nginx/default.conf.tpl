@@ -9,6 +9,11 @@ server {
         expires 7d;
     }
 
+    location /media/ {
+    alias /vol/media/;
+    autoindex off;
+    }
+
     # proxy directly to your app (no HTTPS redirect)
     location / {
         uwsgi_pass ${APP_HOST}:${APP_PORT};
