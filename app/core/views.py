@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic.edit import CreateView
-from .models import Images  # Assuming Images is the model you want to use
+from .models import Images
+  # Assuming Images is the model you want to use
 
 
 class Add(CreateView):
@@ -12,3 +13,7 @@ class Add(CreateView):
     model = Images
     fields = ['image', 'description']
     success_url = '/core/add_image/'
+
+def gallery(request):
+    images = Images.objects.all()
+    return render(request, "gallery.html", {"images": images})

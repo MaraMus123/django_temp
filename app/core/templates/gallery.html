@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Gallery</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #fafafa; }
+        .gallery { display: flex; flex-wrap: wrap; gap: 15px; margin: 20px; }
+        .gallery img { width: 200px; height: auto; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .card { text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>Image Gallery</h1>
+    <div class="gallery">
+        {% for image in images %}
+            <div class="card">
+                <img src="{{ image.image.url }}" alt="{{ image.description }}" />
+                <p>{{ image.description }}</p>
+            </div>
+        {% empty %}
+            <p>No images found.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
